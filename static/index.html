@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Пульс — ИИ-агент на ChatGPT</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="rail" id="rail">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M4 16h5l3-8 4 16 3-8h9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <div class="brand-name">Пульс</div>
+          <div class="brand-sub">агент · ChatGPT</div>
+        </div>
+      </div>
+      <button class="btn-new" id="newChat" type="button">Новый разговор</button>
+      <div class="conv-list" id="convList"></div>
+      <div class="rail-foot">
+        <button class="ghost" id="openSettings" type="button">Настройки ключа</button>
+      </div>
+    </aside>
+
+    <main class="stage">
+      <header class="top">
+        <button class="icon-btn menu" id="toggleRail" type="button" aria-label="Меню">☰</button>
+        <div class="top-title">
+          <h1 id="chatTitle">Новый разговор</h1>
+          <p id="statusLine">ChatGPT не подключён</p>
+        </div>
+        <label class="switch" title="Инструменты агента">
+          <input type="checkbox" id="toolsToggle" checked />
+          <span>агент</span>
+        </label>
+      </header>
+
+      <section class="thread" id="thread"></section>
+
+      <div class="composer-wrap">
+        <div class="tools-log" id="toolsLog" hidden></div>
+        <form class="composer" id="composer">
+          <textarea id="input" rows="1" placeholder="Напишите задачу агенту…" autocomplete="off"></textarea>
+          <button type="submit" id="sendBtn" aria-label="Отправить">➤</button>
+        </form>
+        <p class="hint">Enter — отправить · Shift+Enter — новая строка · ключ хранится только в браузере</p>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal" id="settingsModal" hidden>
+    <div class="sheet">
+      <header>
+        <h2>Подключение ChatGPT</h2>
+        <button class="icon-btn" id="closeSettings" type="button" aria-label="Закрыть">✕</button>
+      </header>
+      <p class="sheet-lead">
+        Ключ берётся на
+        <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a>.
+        Он уходит только на ваш сервер Пульса, затем в OpenAI. В репозиторий не записывается.
+      </p>
+      <label>
+        API-ключ
+        <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off" />
+      </label>
+      <label>
+        Модель
+        <select id="model">
+          <option value="gpt-4o-mini">gpt-4o-mini — быстро и дешево</option>
+          <option value="gpt-4o">gpt-4o — сильнее</option>
+          <option value="gpt-4.1-mini">gpt-4.1-mini</option>
+          <option value="gpt-4.1">gpt-4.1</option>
+          <option value="gpt-5-mini">gpt-5-mini</option>
+          <option value="gpt-5">gpt-5</option>
+        </select>
+      </label>
+      <label>
+        Температура
+        <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7" />
+        <span class="temp-val" id="tempVal">0.7</span>
+      </label>
+      <label>
+        Системный промпт
+        <textarea id="systemPrompt" rows="5" placeholder="Оставьте пустым — будет стандартный промпт Пульса"></textarea>
+      </label>
+      <div class="sheet-actions">
+        <button type="button" class="ghost" id="testKey">Проверить ключ</button>
+        <button type="button" class="primary" id="saveSettings">Сохранить</button>
+      </div>
+      <p class="test-msg" id="testMsg"></p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
