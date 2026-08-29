@@ -6,6 +6,7 @@ const state = {
   conversations: [],
   currentId: null,
   busy: false,
+  serverHasKey: false,
   settings: {
     apiKey: "",
     model: "gpt-4o-mini",
@@ -110,7 +111,7 @@ function renderThread() {
     thread.innerHTML = `
       <div class="empty">
         <h2>Агент на связи.</h2>
-        <p>Пульс ходит в ChatGPT, считает, запоминает факты и читает публичные страницы. Нужен только API-ключ OpenAI.</p>
+        <p>Пульс ходит в ChatGPT, считает, запоминает факты и читает публичные страницы.</p>
         <div class="chips">
           <button class="chip" type="button" data-q="Посчитай (17^3 - 89) / sqrt(16)">Посчитать выражение</button>
           <button class="chip" type="button" data-q="Запомни: меня зовут пользователь Пульса, я из Курска.">Запомнить обо мне</button>
@@ -144,10 +145,16 @@ function messageEl(msg) {
   return el;
 }
 
+function hasKey() {
+  return Boolean(state.settings.apiKey || state.serverHasKey);
+}
+
 function updateStatus() {
   const line = $("statusLine");
-  if (state.settings.apiKey) {
-    line.textContent = `${state.settings.model} · ключ задан`;
+  if (hasKey()) {
+    line.textContent = state.settings.apiKey
+      ? `${state.settings.model} · ключ в браузере`
+      : `${state.settings.model} · ChatGPT подключён`;
     line.className = "ok";
   } else {
     line.textContent = "ChatGPT не подключён — откройте настройки";
@@ -210,7 +217,7 @@ function saveSettings() {
 async function sendMessage(text) {
   const content = (text ?? $("input").value).trim();
   if (!content || state.busy) return;
-  if (!state.settings.apiKey) {
+  if (!hasKey()) {
     showSettings(true);
     $("testMsg").textContent = "Сначала вставьте OpenAI API-ключ.";
     $("testMsg").className = "test-msg bad";
@@ -245,7 +252,7 @@ async function sendMessage(text) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${state.settings.apiKey}`,
+        ...(state.settings.apiKey ? { Authorization: `Bearer ${state.settings.apiKey}` } : {}),
       },
       body: JSON.stringify({
         messages: chat.messages

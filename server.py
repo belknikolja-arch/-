@@ -145,6 +145,17 @@ async def _run_agent(req: ChatRequest, api_key: str) -> AsyncIterator[str]:
         message = getattr(exc, "message", None) or str(exc)
         status = getattr(exc, "status_code", None) or 502
         yield _sse("error", {"status": status, "message": message})
+    except APIConnectionError:
+        yield _sse(
+            "error",
+            {
+                "status": 503,
+                "message": (
+                    "Нет сети до api.openai.com из этой среды. "
+                    "Запустите Пульс у себя: python server.py — ключ уже в .env"
+                ),
+            },
+        )
     except Exception as exc:  # noqa: BLE001
         yield _sse("error", {"status": 500, "message": str(exc)})
     finally:
