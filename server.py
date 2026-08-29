@@ -29,6 +29,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def allow_preview_embed(request, call_next):
+    if request.method == "HEAD" and request.url.path in {"/", "/index.html"}:
+        response = FileResponse(STATIC / "index.html")
+    else:
+        response = await call_next(request)
+    response.headers["Content-Security-Policy"] = "frame-ancestors *"
+    if "x-frame-options" in response.headers:
+        del response.headers["x-frame-options"]
+    return response
+
+
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 
